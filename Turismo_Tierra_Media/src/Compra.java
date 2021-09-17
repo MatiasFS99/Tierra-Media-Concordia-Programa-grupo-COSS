@@ -1,263 +1,115 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Compra {
-    private Object comprado;
+    private Ofertable comprado;
     private int total = 0;
     private double tiempoInvertido = 0;
     private String nombre;
     private String tipo;
 
     public Compra(int presupuesto, double tiempo, String Tipo, ArrayList<Compra> compras, String nombre) {
-        int sel = -1;
         Scanner sc = new Scanner(System.in);
-        boolean ciclo = false;
-        while (!ciclo) {
-            System.out.println("\n\rSe muestran sugerencias para: " + nombre);
-            System.out.println("0 - Ver promociones Absolutas");
-            System.out.println("1 - Ver promociones Porcentuales");
-            System.out.println("2 - Ver promociones AxB");
-            System.out.println("3 - Ver atracciones de forma individual");
-            sel = sc.nextInt();
-            sc.nextLine();
-            switch (sel) {
-                case 0:
-                    this.comprado = comprarPromociones(presupuesto, tiempo, Tipo, "class PackAbsolutas", compras, nombre);
-                    ciclo = true;
-                    break;
-                case 1:
-                    this.comprado = comprarPromociones(presupuesto, tiempo, Tipo, "class PackPorcentuales", compras, nombre);
-                    ciclo = true;
-                    break;
-                case 2:
-                    this.comprado = comprarPromociones(presupuesto, tiempo, Tipo, "class PackAxB", compras, nombre);
-                    ciclo = true;
-                    break;
-                case 3:
-                    this.comprado = comprarAtraccion(presupuesto, tiempo, Tipo, compras, nombre);
-                    ciclo = true;
-                    break;
-                default:
-                    break;
+        boolean compro = false;
+        String sel = "";
+        ArrayList<Ofertable> ofertas = generarOfertas(presupuesto, tiempo, Tipo, compras);
+        for (Ofertable oferta : ofertas) {
+            sel = "";
+            while(!sel.equals("s")&&!sel.equals("S")&&!sel.equals("n")&&!sel.equals("N")){
+                System.out.println(nombre + " , Desea comprar la siguiente oferta : ' "+oferta+" '");
+                System.out.println("Acepta la oferta? S/N");
+                sel = sc.nextLine();
             }
+            if(sel.equals("s")||sel.equals("S")){
+                this.Comprar(oferta);
+                compro = true;
+                break;
+            }
+        }
+        if(!compro){
+            System.out.println("No hay mas ofertas disponibles para "+ nombre);
         }
     }
 
-    private Promocion comprarPromociones(int presupuesto, Double tiempo, String Tipo, String promocion, ArrayList<Compra> compras, String nombre) {
-        ArrayList<Promocion> atracciones = new ArrayList<Promocion>();
-        Scanner sc = new Scanner(System.in);
-        int contPromo = 0;
-        int selecPromo = 0;
-        boolean ciclo = false;
-        Promocion salida = null;
-        Promocion tmp = null;
-        for (Object promo : APP.promociones) {
-            if (promo.getClass().toString().equals(promocion)) {
-                tmp = (Promocion) promo;
-                if ((tmp.getTipo().equals(Tipo)) && (tmp.getPrecio() <= presupuesto) && (tmp.getTiempo() <= tiempo)
-                        && (tmp.Cupo()) && (!existeEnCompras(compras, tmp))) {
-                    atracciones.add((Promocion) promo);
-                }
-            }
+    public Compra(int presupuesto, double tiempo, Ofertable oferta, ArrayList<Compra> compras){
+        if(oferta.getCupo() && oferta.getCosto()<=presupuesto && oferta.getTiempo()<=tiempo && (!estaComprado(compras, oferta))){
+            Comprar(oferta);
         }
-        if (!atracciones.isEmpty()) {
-            Collections.sort(atracciones);
-            while (!ciclo) {
-                System.out.println("\r\nLas promociones " + promocion.substring(10) + " para " + nombre + " son");
-                for (Promocion prom : atracciones) {
-                    System.out.println(contPromo + " : " + prom);
-                    contPromo++;
-                }
-                selecPromo = sc.nextInt();
-                sc.nextLine();
-                if (selecPromo >= 0 & selecPromo < contPromo) {
-                    salida = atracciones.get(selecPromo);
-                    salida.comprado();
-                    this.total = atracciones.get(selecPromo).getPrecio();
-                    this.tiempoInvertido = atracciones.get(selecPromo).getTiempo();
-                    this.nombre = atracciones.get(selecPromo).getNombre();
-                    this.tipo = atracciones.get(selecPromo).getTipo();
-                    comprado = salida;
-                    ciclo = true;
-                }
-                contPromo = 0;
-            }
-        } else {
-            System.out.println("\r\nAVISO: No hay promociones " + promocion.substring(10) + " para " + nombre);
-            salida = comprarPromocionesRestantes(presupuesto, tiempo, compras);
-        }
-
-        return salida;
     }
 
-    private Atraccion comprarAtraccion(int presupuesto, double tiempo, String Tipo, ArrayList<Compra> compras, String nombre){
-        ArrayList<Atraccion> atracciones = new ArrayList<Atraccion>();
-        Scanner sc = new Scanner(System.in);
-        int contPromo = 0;
-        int selecPromo = 0;
-        boolean ciclo = false;
-        Atraccion salida = null;
-        Atraccion tmp = null;
-        for (Object promo : APP.atracciones) {
-            tmp = (Atraccion) promo;
-            if ((tmp.getTipo().equals(Tipo)) && (tmp.getCosto() <= presupuesto) && (tmp.getTiempo() <= tiempo)
-                    && (tmp.getCupo()>0) && (!existeEnCompras(compras, tmp,false))) {
-                atracciones.add((Atraccion) promo);
-            }
-        }
-        if (!atracciones.isEmpty()) {
-            Collections.sort(atracciones);
-            while (!ciclo) {
-                System.out.println("\r\nLas atracciones disponibles para " + nombre + " son:");
-                for (Atraccion prom : atracciones) {
-                    System.out.println(contPromo + " : " + prom);
-                    contPromo++;
-                }
-                selecPromo = sc.nextInt();
-                sc.nextLine();
-                if (selecPromo >= 0 & selecPromo < contPromo) {
-                    salida = atracciones.get(selecPromo);
-                    this.total = atracciones.get(selecPromo).getCosto();
-                    this.tiempoInvertido = atracciones.get(selecPromo).getTiempo();
-                    this.nombre = atracciones.get(selecPromo).getNombre();
-                    this.tipo = atracciones.get(selecPromo).getTipo();
-                    comprado = salida;
-                    ciclo = true;
-                }
-                contPromo = 0;
-            }
-        } else {
-            System.out.println("\r\nAVISO: No hay Atracciones de tipo " + Tipo + " para " + nombre);
-            salida = comprarAtraccionesRestantes(presupuesto, tiempo, compras);
-        }
-        return salida;
+    
+    private void Comprar(Ofertable compra){
+        this.comprado = compra;
+        this.total = compra.getCosto();
+        this.nombre = compra.getNombre();
+        this.tiempoInvertido = compra.getTiempo();
+        this.tipo = compra.getTipo();
+        compra.comprar();
     }
 
-    private Promocion comprarPromocionesRestantes(int presupuesto, Double tiempo,ArrayList<Compra> compras){
-        Promocion salida = null;
-        Promocion tmp;
-        ArrayList<Promocion> promociones = new ArrayList<Promocion>();
-        Scanner sc = new Scanner(System.in);
-        Boolean ciclo = true;
-        int selecPromo = 0;
-        int contPromo=0;
-        for (Object promo : APP.promociones) {
-            tmp = (Promocion) promo;
-            if((tmp.getPrecio() <= presupuesto)&&(tmp.getTiempo() <= tiempo)&&(!existeEnCompras(compras, tmp))){
-                promociones.add(tmp);
+    private ArrayList<Ofertable> generarOfertas(int presupuesto,double tiempo, String tipo,ArrayList<Compra> compras){
+        ArrayList<Ofertable> opciones = new ArrayList<Ofertable>();
+        for (Promocion prom : APP.promociones) {
+            if(prom.getCupo() && prom.getCosto()<=presupuesto && prom.getTiempo()<=tiempo && prom.getTipo().equals(tipo) && (!estaComprado(compras, prom)) ){
+                opciones.add(prom);
             }
         }
-        if(!promociones.isEmpty()){
-            Collections.sort(promociones);
-            
-            while(ciclo){
-                contPromo = 0;
-                System.out.println("\r\nLas promociones restantes son");
-                for (Promocion promocion : promociones) {
-                    System.out.println(contPromo+" : "+promocion);
-                    contPromo++;
-                }
-                selecPromo = sc.nextInt();
-                sc.nextLine();
-                if(selecPromo>=0 && selecPromo<contPromo){
-                    salida = promociones.get(selecPromo);
-                    salida.comprado();
-                    this.total = promociones.get(selecPromo).getPrecio();
-                    this.tiempoInvertido = promociones.get(selecPromo).getTiempo();
-                    this.nombre = promociones.get(selecPromo).getNombre();
-                    this.tipo = promociones.get(selecPromo).getTipo();
-                    comprado = salida;
-                    ciclo = false;
-                }
+        for (Atraccion atr : APP.atracciones) {
+            if(atr.getCupo() && atr.getCosto()<=presupuesto && atr.getTiempo()<=tiempo && atr.getTipo().equals(tipo) && (!estaComprado(compras, atr)) ){
+                opciones.add(atr);
             }
         }
-        return salida;
+            Collections.sort(opciones);
+            opciones.addAll(OfertasRestantes(presupuesto, tiempo, tipo, compras));
+        return opciones;
     }
 
-    private Atraccion comprarAtraccionesRestantes(int presupuesto, double tiempo, ArrayList<Compra> compras){
-        ArrayList<Atraccion> atracciones = new ArrayList<Atraccion>();
-        Scanner sc = new Scanner(System.in);
-        int contPromo = 0;
-        int selecPromo = 0;
-        boolean ciclo = false;
-        Atraccion salida = null;
-        Atraccion tmp = null;
-        for (Object promo : APP.atracciones) {
-            tmp = (Atraccion) promo;
-            if ((tmp.getCosto() <= presupuesto) && (tmp.getTiempo() <= tiempo) && (tmp.getCupo()>0) && (!existeEnCompras(compras, tmp,false))) {
-                atracciones.add((Atraccion) promo);
+    private ArrayList<Ofertable> OfertasRestantes(int presupuesto,double tiempo, String tipo,ArrayList<Compra> compras){
+        ArrayList<Ofertable> opciones = new ArrayList<Ofertable>();
+        for (Promocion prom : APP.promociones) {
+            if(prom.getCupo() && prom.getCosto()<=presupuesto && prom.getTiempo()<=tiempo && !(prom.getTipo().equals(tipo)) && (!estaComprado(compras, prom)) ){
+                opciones.add(prom);
             }
         }
-        if (!atracciones.isEmpty()) {
-            Collections.sort(atracciones);
-            while (!ciclo) {
-                System.out.println("\r\nLas atracciones disponibles para " + nombre + " son:");
-                for (Atraccion prom : atracciones) {
-                    System.out.println(contPromo + " : " + prom);
-                    contPromo++;
-                }
-                selecPromo = sc.nextInt();
-                sc.nextLine();
-                if (selecPromo >= 0 & selecPromo < contPromo) {
-                    salida = atracciones.get(selecPromo);
-                    this.total = atracciones.get(selecPromo).getCosto();
-                    this.tiempoInvertido = atracciones.get(selecPromo).getTiempo();
-                    this.nombre = atracciones.get(selecPromo).getNombre();
-                    this.tipo = atracciones.get(selecPromo).getTipo();
-                    comprado = salida;
-                    ciclo = true;
-                }
-                contPromo = 0;
+        for (Atraccion atr : APP.atracciones) {
+            if(atr.getCupo() && atr.getCosto()<=presupuesto && atr.getTiempo()<=tiempo && !(atr.getTipo().equals(tipo)) && (!estaComprado(compras, atr)) ){
+                opciones.add(atr);
             }
         }
-        return salida;
-    }
+        Collections.sort(opciones);
+        return opciones;
+    } 
 
-    private Boolean existeEnCompras(ArrayList<Compra> listado, Promocion promo){
-        if(listado.isEmpty()){
+    
+    private boolean estaComprado(ArrayList<Compra> compras, Ofertable oferta){
+        if(compras.isEmpty()){
             return false;
         }
-        for (Compra obj : listado) {
-            if(obj.getComprado().getClass().toString().equals("class PackAbsolutas") ||
-            obj.getComprado().getClass().toString().equals("class PackPorcentuales") || 
-            obj.getComprado().getClass().toString().equals("class PackAxB")){
-                if(((Promocion)obj.getComprado()).equals(promo)){
-                    return true;
-                }
-            }
-        }
-        for (Atraccion atra : promo.getAtraccion()) {
-            if(existeEnCompras(listado, atra,false)){
+        for (Compra comp : compras) {
+            if(oferta.equals(comp.getComprado())){
                 return true;
             }
-        }
-        return false;
-    }
-
-    private Boolean existeEnCompras(ArrayList<Compra> listado, Atraccion atra, Boolean reciclo){
-        if(listado.isEmpty()){
-            return false;
-        }
-        for (Compra obj : listado) {
-            if(obj.getComprado().getClass().toString().equals("class Atraccion")){
-                if(((Atraccion)obj.getComprado()).equals(atra)){
-                    return true;
-                }
-            } else {
-                if(!reciclo){
-                    for (Atraccion atr : ((Promocion)obj.getComprado()).getAtraccion()) {
-                        if(existeEnCompras(listado, atr, true)){
-                            return true;
-                        }
+            if(Objects.nonNull(comp.getComprado().getAtracciones())){
+                for (Atraccion atr : comp.getComprado().getAtracciones()){
+                    if(oferta.equals(atr)){
+                        return true;
                     }
                 }
             }
         }
+        if(Objects.nonNull(oferta.getAtracciones())){
+            for(Atraccion atr : oferta.getAtracciones()){
+                if(estaComprado(compras, atr)){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
-    public Object getComprado() {
+    public Ofertable getComprado() {
         return this.comprado;
     }
 

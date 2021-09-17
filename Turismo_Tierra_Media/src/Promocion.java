@@ -1,16 +1,22 @@
 import java.util.ArrayList;
 import java.util.Objects;
 
-public abstract class Promocion implements Comparable<Promocion> {
+public abstract class Promocion extends Ofertable{
     protected String tipo;
     protected String nombre;
-    protected int precio;
+    protected int costo;
     protected ArrayList<Atraccion> atracciones = new ArrayList<Atraccion>();
 
     public Promocion(String tipo, String nombre, String atraccion) {
         this.tipo = tipo;
         this.nombre = nombre;
         descifrar(atraccion);
+    }
+
+    public Promocion(String tipo, String nombre, ArrayList atraccion){
+        this.tipo = tipo;
+        this.nombre = nombre;
+        this.atracciones = atraccion;
     }
 
     public Atraccion[] descifrar(String entrada){
@@ -23,11 +29,11 @@ public abstract class Promocion implements Comparable<Promocion> {
                 }
             }
         }
-        this.precio = GenerarPrecio();
+        this.costo = Generarcosto();
         return null;
     }
 
-    public int GenerarPrecio(){
+    public int Generarcosto(){
         int salida=0;
         for (Atraccion atra : this.atracciones) {
             salida += atra.getCosto();
@@ -35,16 +41,20 @@ public abstract class Promocion implements Comparable<Promocion> {
         return salida;
     }
 
-    public boolean Cupo(){
+    public boolean getCupo(){
         boolean salida = true;
         for (Atraccion var : atracciones) {
-            if(var.getCupo() == 0){
+            if(!var.getCupo()){
                 salida = false;
             }
         }
         return salida;
     }
-
+    
+    @Override
+    public ArrayList<Atraccion> getAtracciones(){
+        return this.atracciones;
+    }
     public String getTipo() {
         return this.tipo;
     }
@@ -53,18 +63,18 @@ public abstract class Promocion implements Comparable<Promocion> {
         return this.nombre;
     }
 
-    public int getPrecio() {
-        return this.precio;
+    public int getCosto() {
+        return this.costo;
     }
 
-    protected void setPrecio(int entrada) {
-        this.precio = entrada;
+    protected void setCosto(int entrada) {
+        this.costo = entrada;
     }
     public ArrayList<Atraccion> getAtraccion() {
         return this.atracciones;
     }
 
-    public double getTiempo(){
+    public Double getTiempo(){
         double salida = 0.0;
         for (Atraccion atr : atracciones) {
             salida += atr.getTiempo();
@@ -72,9 +82,9 @@ public abstract class Promocion implements Comparable<Promocion> {
         return salida;
     }
 
-    public void comprado(){
+    public void comprar(){
         for(int i=0; i<atracciones.size();i++){
-            atracciones.get(i).agregarPersona();
+            atracciones.get(i).comprar();
         }
     }
 
@@ -84,21 +94,18 @@ public abstract class Promocion implements Comparable<Promocion> {
         for (Atraccion atraccion : this.atracciones) {
             atracciones+=atraccion.getNombre()+" - ";
         }
-        return
-            getNombre() + ", Atracciones incluidas: " + atracciones + ", Tipo: " + getTipo();
+        atracciones = atracciones.substring(0, atracciones.length()-3);
+        return getNombre() + ", Atracciones incluidas: " + atracciones + ", Tipo: " + getTipo();
     }
 
-    public int compareTo(Promocion prom){
-        int salida = Integer.compare(prom.precio, this.getPrecio());
-        if(salida!=0){
-            return salida;
+    public String getConformacion(){
+        String atracciones = "";
+        for (Atraccion atraccion : this.atracciones) {
+            atracciones+=atraccion.getNombre()+"-";
         }
-        else{
-            salida = Double.compare(prom.getTiempo(), this.getTiempo());
-        }
-        return salida;
+        atracciones = atracciones.substring(0, atracciones.length()-1);
+        return atracciones;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -108,6 +115,6 @@ public abstract class Promocion implements Comparable<Promocion> {
             return false;
         }
         Promocion promocion = (Promocion) o;
-        return Objects.equals(tipo, promocion.tipo) && Objects.equals(nombre, promocion.nombre) && precio == promocion.precio && Objects.equals(atracciones, promocion.atracciones);
+        return Objects.equals(tipo, promocion.tipo) && Objects.equals(nombre, promocion.nombre) && costo == promocion.costo && Objects.equals(atracciones, promocion.atracciones);
     }
 }

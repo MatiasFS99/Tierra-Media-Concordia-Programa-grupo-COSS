@@ -1,6 +1,6 @@
 import java.util.Objects;
 
-public class Atraccion implements Comparable<Atraccion> {
+public class Atraccion extends Ofertable{
     private String nombre;
     private int Costo;
     private Double Tiempo;
@@ -15,7 +15,7 @@ public class Atraccion implements Comparable<Atraccion> {
         this.Tipo = tipo;
     }
 
-    public void agregarPersona(){
+    public void comprar(){
         this.Cupo -= 1;
     }
 
@@ -31,14 +31,17 @@ public class Atraccion implements Comparable<Atraccion> {
         return this.Tiempo;
     }
 
-    public int getCupo() {
-        return this.Cupo;
+    public boolean getCupo() {
+        return this.Cupo>0;
     }
 
     public String getTipo() {
         return this.Tipo;
     }
 
+    public String getConformacion(){
+        return this.nombre;
+    }
 
     @Override
     public String toString() {
@@ -54,16 +57,5 @@ public class Atraccion implements Comparable<Atraccion> {
         }
         Atraccion atraccion = (Atraccion) o;
         return Objects.equals(nombre, atraccion.nombre) && Costo == atraccion.Costo && Objects.equals(Tiempo, atraccion.Tiempo) && Cupo == atraccion.Cupo && Objects.equals(Tipo, atraccion.Tipo);
-    }
-
-    public int compareTo(Atraccion a){
-        int salida = Integer.compare(a.Costo, this.getCosto());
-        if(salida!=0){
-            return salida;
-        }
-        else{
-            salida = Double.compare(a.getTiempo(), this.getTiempo());
-        }
-        return salida;
     }
 }

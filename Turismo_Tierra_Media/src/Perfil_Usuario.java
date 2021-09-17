@@ -23,8 +23,27 @@ public class Perfil_Usuario {
             compras.add(tmp);
             this.presupuesto -= tmp.getTotal();
             this.horasDisp -= tmp.getTiempoInvertido();
+        }
+    }
+
+    public boolean Comprar(Ofertable oferta){
+        Compra tmp = new Compra(this.presupuesto, this.horasDisp, oferta, this.compras);
+        if(Objects.nonNull(tmp.getComprado())){
+            compras.add(tmp);
+            this.presupuesto -= tmp.getTotal();
+            this.horasDisp -= tmp.getTiempoInvertido();
+            return true;
         } else {
-            System.out.println("No existen ofertas de ese tipo disponibles");
+            return false;
+        }
+    }
+
+    public boolean puedeComprar(Ofertable oferta){
+        Compra tmp = new Compra(this.presupuesto, this.horasDisp, oferta, this.compras);
+        if(Objects.nonNull(tmp.getComprado())){
+            return true;
+        } else {
+            return false;
         }
     }
 

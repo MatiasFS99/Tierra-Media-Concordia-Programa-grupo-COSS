@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class APP {
     public static ArrayList<Atraccion> atracciones = cargarAtracciones();
-    public static ArrayList<Object> promociones = cargarPromociones();
+    public static ArrayList<Promocion> promociones = cargarPromociones();
     public static ArrayList<Perfil_Usuario> usuarios = cargarPerfiles();
 
     public static ArrayList<Atraccion> cargarAtracciones(){
@@ -26,10 +26,10 @@ public class APP {
         }
     }
 
-    public static ArrayList<Object> cargarPromociones(){
+    public static ArrayList<Promocion> cargarPromociones(){
         try{
             String[] entrada;
-            ArrayList<Object> salida = new ArrayList<Object>();
+            ArrayList<Promocion> salida = new ArrayList<Promocion>();
             File fprom = new File("promociones.csv");
             Scanner prom = new Scanner(fprom);
             while(prom.hasNextLine()){
