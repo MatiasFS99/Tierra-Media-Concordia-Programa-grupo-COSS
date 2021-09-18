@@ -12,11 +12,15 @@ public class PackAxB extends Promocion{
     }
 
     public void obtener(String entrada){
+        boolean error = true;
         for (Atraccion atr : APP.atracciones) {
             if(atr.getNombre().equals(entrada)){
                 atracciones.add(atr);
+                error = false;
             }
         }
-        System.out.println("no se encuentra el regalo en la atraccion: " + this.nombre + " revisar el archivo csv");
+        if(error){
+            System.out.println("no se encuentra el regalo en la atraccion: " + this.nombre + " revisar el archivo csv");
+        }
     }
 }
