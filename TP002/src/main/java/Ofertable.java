@@ -11,6 +11,9 @@ public abstract class Ofertable implements Comparable<Ofertable>{
     public ArrayList<Atraccion> getAtracciones(){
         return null;
     }
+    public int getId() {
+    	return -1;
+    }
     public int compareTo(Ofertable a){
         int salida = Integer.compare(a.getCosto(), this.getCosto());
         if(salida!=0){

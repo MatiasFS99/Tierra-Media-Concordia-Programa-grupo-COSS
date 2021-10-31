@@ -16,7 +16,7 @@ public class Atraccion extends Ofertable{
     }
 
     public void comprar(){
-        this.Cupo -= 1;
+        LlamadosDB.updateAtraccion(this.nombre);
     }
 
     public String getNombre() {
@@ -34,6 +34,10 @@ public class Atraccion extends Ofertable{
     public boolean getCupo() {
         return this.Cupo>0;
     }
+    
+    public int getNCupo() {
+        return this.Cupo;
+    }
 
     public String getTipo() {
         return this.Tipo;
@@ -45,7 +49,7 @@ public class Atraccion extends Ofertable{
 
     @Override
     public String toString() {
-        return getNombre() + ", Tipo: " + getTipo();
+        return getNombre() + ", Tipo: " + getTipo()+", Precio: "+ getCosto();
     }
 
     @Override

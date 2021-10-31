@@ -1,33 +1,34 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class Promocion extends Ofertable{
     protected String tipo;
     protected String nombre;
     protected int costo;
-    protected ArrayList<Atraccion> atracciones = new ArrayList<Atraccion>();
-
-    public Promocion(String tipo, String nombre, String atraccion) {
+    protected int id;
+    protected ArrayList<String> atracciones = new ArrayList<String>();
+    
+    public Promocion(String tipo, String nombre, String atraccion,int id) {
         this.tipo = tipo;
         this.nombre = nombre;
         descifrar(atraccion);
+        this.id = id;
     }
 
-    public Promocion(String tipo, String nombre, ArrayList atraccion){
+    public Promocion(String tipo, String nombre, ArrayList atraccion, int id){
         this.tipo = tipo;
         this.nombre = nombre;
         this.atracciones = atraccion;
+        this.id = id;
     }
-
+    
     public Atraccion[] descifrar(String entrada){
-        String[] nombres = entrada.split("-");
+    	String[] nombres = entrada.split("-");
+        String str;
         for (String nombre : nombres) {
-            for (int i=0;i<APP.atracciones.size();i++) {
-                if(APP.atracciones.get(i).getNombre().equals(nombre)){
-                    this.atracciones.add(APP.atracciones.get(i));
-                    break;
-                }
-            }
+        	str = nombre.trim();
+            this.atracciones.add(str);
         }
         this.costo = Generarcosto();
         return null;
@@ -35,25 +36,29 @@ public abstract class Promocion extends Ofertable{
 
     public int Generarcosto(){
         int salida=0;
-        for (Atraccion atra : this.atracciones) {
-            salida += atra.getCosto();
+        for (String natra : this.atracciones) {
+            salida += LlamadosDB.selectAtraccion(natra).getCosto();
         }
         return salida;
     }
 
     public boolean getCupo(){
         boolean salida = true;
-        for (Atraccion var : atracciones) {
-            if(!var.getCupo()){
-                salida = false;
-            }
+        for(String natra : this.atracciones) {
+        	if(!LlamadosDB.selectAtraccion(natra).getCupo()) {
+        		salida = false;
+        	}
         }
         return salida;
     }
     
     @Override
     public ArrayList<Atraccion> getAtracciones(){
-        return this.atracciones;
+    	ArrayList<Atraccion> salida = new ArrayList<Atraccion>();
+    	for(String natra : this.atracciones) {
+        	salida.add(LlamadosDB.selectAtraccion(natra));
+        }
+    	return salida;
     }
     public String getTipo() {
         return this.tipo;
@@ -70,38 +75,33 @@ public abstract class Promocion extends Ofertable{
     protected void setCosto(int entrada) {
         this.costo = entrada;
     }
-    public ArrayList<Atraccion> getAtraccion() {
-        return this.atracciones;
-    }
 
     public Double getTiempo(){
         double salida = 0.0;
-        for (Atraccion atr : atracciones) {
-            salida += atr.getTiempo();
+        for (String natra : this.atracciones) {
+            salida += LlamadosDB.selectAtraccion(natra).getTiempo();
         }
         return salida;
     }
 
     public void comprar(){
-        for(int i=0; i<atracciones.size();i++){
-            atracciones.get(i).comprar();
-        }
+    	LlamadosDB.updatePromocion(this.id);
     }
 
     @Override
     public String toString() {
         String atracciones = "";
-        for (Atraccion atraccion : this.atracciones) {
-            atracciones+=atraccion.getNombre()+" - ";
+        for (String atraccion : this.atracciones) {
+            atracciones+=atraccion+" - ";
         }
         atracciones = atracciones.substring(0, atracciones.length()-3);
-        return getNombre() + ", Atracciones incluidas: " + atracciones + ", Tipo: " + getTipo();
+        return getNombre() + ", Atracciones incluidas: " + atracciones + ", Tipo: " + getTipo() + ", Precio: " + getCosto();
     }
 
     public String getConformacion(){
         String atracciones = "";
-        for (Atraccion atraccion : this.atracciones) {
-            atracciones+=atraccion.getNombre()+"-";
+        for (String atraccion : this.atracciones) {
+            atracciones+=LlamadosDB.selectAtraccion(atraccion).getNombre()+"-";
         }
         atracciones = atracciones.substring(0, atracciones.length()-1);
         return atracciones;
@@ -116,5 +116,9 @@ public abstract class Promocion extends Ofertable{
         }
         Promocion promocion = (Promocion) o;
         return Objects.equals(tipo, promocion.tipo) && Objects.equals(nombre, promocion.nombre) && costo == promocion.costo && Objects.equals(atracciones, promocion.atracciones);
+    }
+    @Override
+    public int getId() {
+    	return this.id;
     }
 }

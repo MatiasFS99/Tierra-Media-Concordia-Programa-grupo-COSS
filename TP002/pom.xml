@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>argPrograma</groupId>
+  <artifactId>TP002</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Turismo en la Tierra Media II</name>
+  <description>capitulo 2</description>
+  <dependencies>
+  		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.36.0.3</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.junit.platform</groupId>
+		    <artifactId>junit-platform-console-standalone</artifactId>
+		    <version>1.7.0-M1</version>
+		    <scope>test</scope>
+		</dependency>
+  </dependencies>
+</project>
